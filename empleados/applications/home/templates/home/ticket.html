@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ticket {{ venta.id }}</title>
+    <style>
+        body {
+            font-family: monospace;
+            width: 300px;
+            margin: auto;
+        }
+
+        h2, p {
+            text-align: center;
+            margin: 5px 0;
+        }
+
+        table {
+            width: 100%;
+            font-size: 14px;
+        }
+
+        th, td {
+            text-align: left;
+        }
+
+        .right {
+            text-align: right;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px dashed black;
+            margin: 8px 0;
+        }
+
+        .total {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .no-print {
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        @media print {
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h2>FORRAJERIA</h2>
+    <p>Ticket N° {{ venta.id }}</p>
+    <p>{{ venta.fecha }}</p>
+
+    <hr>
+
+    <table>
+        <tr>
+            <th>Producto</th>
+            <th>Cant</th>
+            <th class="right">Sub</th>
+        </tr>
+{% for item in venta.detalleventa_set.all %}
+<tr>
+    <td>{{ item.producto.nombre }}</td>
+    <td>{{ item.cantidad }}</td>
+    <td>$ {{ item.precio }}</td>
+    <td>$ {{ item.subtotal }}</td>
+</tr>
+{% endfor %}
+    </table>
+
+    <hr>
+
+    <p class="total">TOTAL: $ {{ venta.total }}</p>
+
+    <hr>
+
+    <p>Gracias por su compra</p>
+
+    <div class="no-print">
+        <button onclick="window.print()">🖨 Imprimir</button>
+        <br><br>
+        <a href="{% url 'venta' %}">Nueva Venta</a>
+    </div>
+<script>
+<button onclick="window.print()">🖨️ Imprimir</button>
+</script>
+</body>
+</html>

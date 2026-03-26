@@ -1,0 +1,64 @@
+    {% extends 'base.html' %}
+
+    {% block content %}
+
+<head>
+    <title>Reporte Diario</title>
+</head>
+<body>
+
+    <h2>Reporte Diario - {{ hoy }}</h2>
+
+    <p>Cantidad de ventas: {{ cantidad_ventas }}</p>
+    <p>Total vendido: $ {{ total_hoy }}</p>
+
+    <hr>
+
+    <table border="1" width="100%">
+        <tr>
+            <th>Ticket</th>
+            <th>Hora</th>
+            <th>Medio de Pago</th>
+            <th>Total</th>
+            <th>Acción</th>
+        </tr>
+
+        {% for venta in ventas %}
+
+        <tr>
+            <td>{{ venta.id }}</td>
+            <td>{{ venta.fecha|date:"H:i" }}</td>
+            <td>{{ venta.get_medio_pago_display }}</td>
+            <td>$ {{ venta.total }}</td>
+            <td>
+                <a href="{% url 'reimprimir_venta' venta.id %}" target="_blank">
+                    🖨️ Reimprimir
+                </a>
+            </td>
+        </tr>
+
+        <tr>
+            <td colspan="5" style="background-color:#f5f5f5;">
+                <strong>Detalle:</strong>
+                <ul style="margin:5px 0;">
+                    {% for item in venta.detalleventa_set.all %}
+                        <li>
+                            {{ item.producto.nombre }}
+                            — Cant: {{ item.cantidad }}
+                            — Precio: $ {{ item.precio }}
+                            — Subtotal: $ {{ item.subtotal }}
+                        </li>
+                    {% empty %}
+                        <li>Sin detalles</li>
+                    {% endfor %}
+                </ul>
+            </td>
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+</body>
+
+{% endblock %}

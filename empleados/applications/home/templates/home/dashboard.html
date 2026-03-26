@@ -1,0 +1,188 @@
+    {% extends 'base.html' %}
+
+    {% block content %}
+
+    <h2 class="mb-4">📊 Dashboard General</h2>
+
+    <div class="row g-4">
+
+        <div class="col-md-3">
+            <div class="card shadow border-0 rounded-4">
+                <div class="card-body text-center">
+                    <h5 class="text-muted">💰 Total Ventas</h5>
+                    <h2>$ {{ total_ventas }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow border-0 rounded-4">
+                <div class="card-body text-center">
+                    <h5 class="text-muted">💵 Efectivo</h5>
+                    <h2>$ {{ total_efectivo }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow border-0 rounded-4">
+                <div class="card-body text-center">
+                    <h5 class="text-muted">🏦 Transferencias</h5>
+                    <h2>$ {{ total_transferencia }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card shadow border-0 rounded-4">
+                <div class="card-body text-center">
+                    <h5 class="text-muted">🧾 Gastos</h5>
+                    <h2>$ {{ total_gastos }}</h2>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <hr class="my-4">
+
+    <div class="row g-4">
+
+        <div class="col-md-6">
+            <div class="card shadow border-0 rounded-4">
+                <div class="card-body">
+                    <h4>👥 Ventas por Empleado</h4>
+
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Empleado</th>
+                                <th>Cantidad</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for empleado in ventas_por_empleado %}
+                            <tr>
+                                <td>{{ empleado.usuario__username }}</td>
+                                <td>{{ empleado.cantidad }}</td>
+                                <td>$ {{ empleado.total }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="3">No hay ventas</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card shadow border-0 rounded-4">
+                <div class="card-body">
+                    <h4>📈 Ventas por Empleado</h4>
+                    <canvas id="graficoEmpleado"></canvas>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <hr class="my-4">
+
+    <div class="row g-4">
+
+        <div class="col-md-6">
+            <div class="card shadow border-0 rounded-4">
+                <div class="card-body">
+                    <h4>🔥 Productos Más Vendidos</h4>
+
+                    <ul class="list-group">
+                        {% for producto in productos_vendidos %}
+                        <li class="list-group-item d-flex justify-content-between">
+                            {{ producto.producto__nombre }}
+                            <span>{{ producto.total }}</span>
+                        </li>
+                        {% empty %}
+                        <li class="list-group-item">Sin ventas</li>
+                        {% endfor %}
+                    </ul>
+
+                </div>
+            </div>
+        </div>
+<hr class="my-4">
+
+<div class="card shadow border-0 rounded-4">
+    <div class="card-body">
+        <h4>⏰ Ventas por Hora</h4>
+        <canvas id="graficoHora"></canvas>
+    </div>
+</div>
+        <div class="col-md-6">
+            <div class="card shadow border-0 rounded-4">
+                <div class="card-body">
+                    <h4>🟢 Cajas Abiertas</h4>
+
+                    <ul class="list-group">
+                        {% for caja in cajas_abiertas %}
+                        <li class="list-group-item">
+                            {{ caja.usuario }} abrió con $ {{ caja.monto_inicial }}
+                        </li>
+                        {% empty %}
+                        <li class="list-group-item">No hay cajas abiertas</li>
+                        {% endfor %}
+                    </ul>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+{{ empleados|json_script:"empleados-data" }}
+{{ totales|json_script:"totales-data" }}
+{{ horas|json_script:"horas-data" }}
+{{ totales_hora|json_script:"totaleshora-data" }}
+
+<script>
+const empleadosGrafico = JSON.parse(document.getElementById('empleados-data').textContent);
+const totalesGrafico = JSON.parse(document.getElementById('totales-data').textContent);
+
+const ctxEmpleado = document.getElementById('graficoEmpleado');
+
+new Chart(ctxEmpleado, {
+    type: 'bar',
+    data: {
+        labels: empleadosGrafico,
+        datasets: [{
+            label: 'Ventas',
+            data: totalesGrafico
+        }]
+    }
+});
+
+const horasGrafico = JSON.parse(document.getElementById('horas-data').textContent);
+const totalesHoraGrafico = JSON.parse(document.getElementById('totaleshora-data').textContent);
+
+const ctxHora = document.getElementById('graficoHora');
+
+new Chart(ctxHora, {
+    type: 'line',
+    data: {
+        labels: horasGrafico,
+        datasets: [{
+            label: 'Ventas por hora',
+            data: totalesHoraGrafico
+        }]
+    }
+});
+</script>
+</script>
+
+{% endblock %}

@@ -1,0 +1,10 @@
+<form method="POST">
+
+    {% csrf_token %}
+
+    <label>Monto inicial</label>
+    <input type="number" step="0.01" name="monto_inicial">
+
+    <button type="submit">Abrir caja</button>
+
+</form>

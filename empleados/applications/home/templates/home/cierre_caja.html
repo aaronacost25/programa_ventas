@@ -1,0 +1,206 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2>📦 Cierre de Caja</h2>
+
+<form method="GET">
+    <label>Seleccionar fecha:</label>
+    <input type="date" name="fecha" value="{{ fecha|date:'Y-m-d' }}">
+    <button type="submit">Ver</button>
+</form>
+
+<hr>
+
+{% if apertura %}
+<div style="background:#e6ffe6;padding:10px;border-radius:5px;">
+    <h3>🟢 Apertura de Caja</h3>
+    <p><strong>Monto Inicial:</strong> $ {{ apertura.monto_inicial }}</p>
+    <p><strong>Abierta por:</strong> {{ apertura.usuario }}</p>
+</div>
+{% else %}
+<div style="background:#ffcccc;padding:10px;border-radius:5px;">
+    ⚠ No hay apertura de caja
+</div>
+{% endif %}
+
+<hr>
+
+<div style="background:#f2f2f2;padding:15px;border-radius:5px;">
+    <h3>📊 Resumen del Día</h3>
+    <p>💵 Efectivo: $ {{ total_efectivo }}</p>
+    <p>🏦 Transferencia: $ {{ total_transferencia }}</p>
+    <p>📱 QR: $ {{ total_qr }}</p>
+    <p>💳 Débito: $ {{ total_debito }}</p>
+    <p>💳 Crédito: $ {{ total_credito }}</p>
+    <p>🧾 Gastos: $ {{ total_gastos }}</p>
+</div>
+
+<hr>
+
+<div style="margin-bottom:15px;">
+    <a href="{% url 'registrar_gasto' %}" class="btn btn-warning">
+        🧾 Registrar Gasto
+    </a>
+</div>
+
+<h3>🔒 Cerrar Caja</h3>
+
+<form method="POST">
+    {% csrf_token %}
+    <label>Monto contado en caja:</label>
+    <input type="number" step="0.01" name="monto_real" required>
+    <button type="submit">Confirmar Cierre</button>
+</form>
+
+{% if cierre %}
+
+<hr>
+
+<h3>Resultado del Cierre</h3>
+
+<p><strong>Total sistema:</strong> $ {{ cierre.total_sistema }}</p>
+<p><strong>Monto contado:</strong> $ {{ cierre.monto_real }}</p>
+
+<p>
+<strong>Diferencia:</strong>
+<span style="font-weight:bold;color:{{ color_diferencia }};">
+$ {{ cierre.diferencia }}
+</span>
+</p>
+
+{% if cierre.diferencia != 0 %}
+<div style="background:#ffe6e6;padding:10px;margin-top:10px;">
+⚠ Atención: existe una diferencia en caja
+</div>
+{% endif %}
+
+<form method="POST" action="{% url 'logout' %}">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-dark">
+        🔐 Cerrar Sesión
+    </button>
+</form>
+
+{% endif %}
+
+<hr>
+
+<hr>
+
+<h3 class="mt-4">🧾 Detalle de Ventas</h3>
+
+<div class="table-responsive">
+<table class="table table-bordered table-hover align-middle">
+
+<thead class="table-dark">
+<tr>
+<th>ID</th>
+<th>Hora</th>
+<th>Medio de Pago</th>
+<th>Total</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for venta in ventas %}
+
+<tr>
+<td>{{ venta.id }}</td>
+<td>{{ venta.fecha|date:"H:i" }}</td>
+<td>{{ venta.get_medio_pago_display }}</td>
+<td><strong>$ {{ venta.total }}</strong></td>
+</tr>
+
+<tr>
+<td colspan="4" class="bg-light">
+<strong>Productos vendidos:</strong>
+
+<ul class="mb-0 mt-2">
+{% for item in venta.detalleventa_set.all %}
+<li>
+{{ item.producto.nombre }} — Cant: {{ item.cantidad }} — Precio: $ {{ item.precio }} — Subtotal: $ {{ item.subtotal }}
+</li>
+{% endfor %}
+</ul>
+
+</td>
+</tr>
+
+{% empty %}
+
+<tr>
+<td colspan="4" class="text-center">No hay ventas</td>
+</tr>
+
+{% endfor %}
+
+</tbody>
+</table>
+</div>
+
+<hr>
+
+<h3 class="mt-4">🧾 Detalle de Gastos</h3>
+
+<div class="table-responsive">
+<table class="table table-bordered table-hover align-middle">
+
+<thead class="table-warning">
+<tr>
+<th>Hora</th>
+<th>Descripción</th>
+<th>Monto</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for gasto in gastos %}
+<tr>
+<td>{{ gasto.fecha|date:"H:i" }}</td>
+<td>{{ gasto.descripcion }}</td>
+<td><strong>$ {{ gasto.monto }}</strong></td>
+</tr>
+
+{% empty %}
+
+<tr>
+<td colspan="3" class="text-center">No hay gastos registrados</td>
+</tr>
+
+{% endfor %}
+
+</tbody>
+</table>
+</div>
+
+<h3>📈 Ventas por Medio de Pago</h3>
+
+<canvas id="graficoVentas"></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+const efectivo = Number("{{ total_efectivo|default:'0' }}");
+const transferencia = Number("{{ total_transferencia|default:'0' }}");
+const qr = Number("{{ total_qr|default:'0' }}");
+const debito = Number("{{ total_debito|default:'0' }}");
+const credito = Number("{{ total_credito|default:'0' }}");
+
+const ctx = document.getElementById('graficoVentas');
+
+new Chart(ctx, {
+type: 'bar',
+data: {
+labels: ['Efectivo','Transferencia','QR','Débito','Crédito'],
+datasets: [{
+label: 'Ventas',
+data: [efectivo, transferencia, qr, debito, credito]
+}]
+}
+});
+</script>
+
+{% endblock %}

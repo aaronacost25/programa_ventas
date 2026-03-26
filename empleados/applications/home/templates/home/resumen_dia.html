@@ -1,0 +1,24 @@
+<h1>Resumen del día</h1>
+
+<table border="1">
+    <tr>
+        <th>Empleado</th>
+        <th>Efectivo</th>
+        <th>Transferencia</th>
+    </tr>
+
+    {% for r in resumen_empleados %}
+    <tr>
+        <td>{{ r.usuario }}</td>
+        <td>${{ r.efectivo }}</td>
+        <td>${{ r.transferencia }}</td>
+    </tr>
+    {% endfor %}
+
+</table>
+
+<h2>Total del negocio</h2>
+
+<p>Efectivo: ${{ total_efectivo_dia }}</p>
+<p>Transferencias: ${{ total_transferencia_dia }}</p>
+<p><strong>Total: ${{ total_general }}</strong></p>

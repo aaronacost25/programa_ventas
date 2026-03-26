@@ -1,0 +1,13 @@
+<h2>🧾 Registrar Gasto</h2>
+
+<form method="POST">
+    {% csrf_token %}
+
+    <label>Descripción:</label>
+    <input type="text" name="descripcion" required>
+
+    <label>Monto:</label>
+    <input type="number" step="0.01" name="monto" required>
+
+    <button type="submit">Guardar</button>
+</form>
