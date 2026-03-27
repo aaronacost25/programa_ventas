@@ -1,1 +1,1 @@
-web: gunicorn empleados.wsgi
+web: gunicorn empleados.empleados.wsgi
