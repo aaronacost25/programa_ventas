@@ -56,7 +56,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'empleados.urls'
+ROOT_URLCONF = 'empleados.empleados.urls'
 
 from pathlib import Path
 
